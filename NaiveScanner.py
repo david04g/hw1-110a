@@ -92,12 +92,15 @@ class NaiveScanner:
                 self.ss.eat_char()
             return Lexeme(Token.ID, value)
 
-        if self.ss.peek_char() in NUMS:
+        if self.ss.peek_char() in NUMS or self.ss.peek_char() == ".":
             value = ""
             used = False
+            digit = False
             while True:
                 c = self.ss.peek_char()
+
                 if c in NUMS:
+                    digit = True
                     value += c
                     self.ss.eat_char()
                 elif c == "." and not used:
@@ -105,15 +108,13 @@ class NaiveScanner:
                     value+=c
                     self.ss.eat_char()
                     if self.ss.peek_char() not in NUMS:
-                        raise ScannerException
+                        raise ScannerException()
                 else:
                     break
-            return Lexeme(Token.NUM, value)
+        if not digit:
+            raise ScannerException()
 
-        # if we cannot match a token, throw an exception
-        # you should implement a line number to pass
-        # to the exeception
-        raise ScannerException()
+        return Lexeme(Token.NUM, value)
     
 
 if __name__ == "__main__":
