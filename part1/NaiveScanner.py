@@ -38,6 +38,7 @@ class Token(Enum):
     SEMI   = "SEMI"
     ID     = "ID"
     NUM    = "NUM"
+    INCR   = "INCR"
 
 
 class Lexeme:
@@ -66,6 +67,9 @@ class NaiveScanner:
         # Scan for the single character tokens
         if self.ss.peek_char() == "+":
             self.ss.eat_char()
+            if self.ss.peek_char() == "+":
+                self.ss.eat_char()
+                return Lexeme(Token.INCR,"++")
             return Lexeme(Token.ADD, "+")
         
         if self.ss.peek_char() == "*":
@@ -76,19 +80,34 @@ class NaiveScanner:
             self.ss.eat_char()
             return Lexeme(Token.ASSIGN, "=")
 
+        if self.ss.peek_char() == ";":
+            self.ss.eat_char()
+            return Lexeme(Token.SEMI, ";")
+
         # Scan for the multi character tokens
         if self.ss.peek_char() in CHARS:
             value = ""
-            while self.ss.peek_char() in CHARS:
+            while self.ss.peek_char() in CHARS+NUMS:
                 value += self.ss.peek_char()
                 self.ss.eat_char()
             return Lexeme(Token.ID, value)
 
         if self.ss.peek_char() in NUMS:
             value = ""
-            while self.ss.peek_char() in NUMS:
-                value += self.ss.peek_char()
-                self.ss.eat_char()
+            used = False
+            while True:
+                c = self.ss.peek_char()
+                if c in NUMS:
+                    value += c
+                    self.ss.eat_char()
+                elif c == "." and not used:
+                    used = True
+                    value+=c
+                    self.ss.eat_char()
+                    if self.ss.peek_char() not in NUMS:
+                        raise ScannerException
+                else:
+                    break
             return Lexeme(Token.NUM, value)
 
         # if we cannot match a token, throw an exception
