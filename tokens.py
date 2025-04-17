@@ -46,9 +46,7 @@ def id_or_key(l: Lexeme) -> Lexeme:
     return l
 
 tokens = [
-    (Token.ID,     r"[a-zA-Z_][a-zA-Z_0-9]*", id_or_key),
-    (Token.NUM,    r"([0-9]+\.[0-9]+|[0-9]+|\.[0-9]+)", idy),
-    (Token.HNUM,   r"0[xX][0-9a-fA-F]+", idy),
+        (Token.HNUM,   r"0[xX][0-9a-fA-F]+", idy),
     (Token.INCR,   r"\+\+", idy),
     (Token.PLUS,   r"\+", idy),
     (Token.MULT,   r"\*", idy),
@@ -58,5 +56,7 @@ tokens = [
     (Token.LBRACE, r"\{", idy),
     (Token.RBRACE, r"\}", idy),
     (Token.ASSIGN, r"=", idy),
+    (Token.ID,     r"[a-zA-Z_][a-zA-Z_0-9]*", id_or_key),
+    (Token.NUM, r"(0|[1-9][0-9]*)(\.[0-9]+)?|\.[0-9]+", idy),
     (Token.IGNORE, r"[ \n\t]+", idy)
 ]
