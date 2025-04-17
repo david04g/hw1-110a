@@ -36,7 +36,8 @@ class SOSScanner:
             if match:
                 matched_text = match.group(0)
                 self.istring = self.istring[len(matched_text):]
-                return action(token_type, matched_text)
+                lexeme = Lexeme(token_type, matched_text)
+                return action(lexeme)
 
         raise ScannerException(f"Unexpected char: {self.istring[0]}")
 
