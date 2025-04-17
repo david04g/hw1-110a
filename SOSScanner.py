@@ -36,6 +36,8 @@ class SOSScanner:
             if match:
                 matched_text = match.group(0)
                 self.istring = self.istring[len(matched_text):]
+                if token_type == Token.IGNORE:
+                    return self.token()
                 lexeme = Lexeme(token_type, matched_text)
                 return action(lexeme)
 
