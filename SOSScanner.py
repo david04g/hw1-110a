@@ -22,7 +22,25 @@ class SOSScanner:
 
     def token(self) -> Optional[Lexeme]:
         # Implement me!
-        pass
+        if self.istring == "":
+            return None
+
+        while self.istring and self.istring[0] in [' ','\n','\t']:
+            self.istring = self.istring[1:]
+
+        if self.istring == "":
+            return None
+
+        for token_type, regex, action in self.tokens:
+            match = re.match(regex, self.istring)
+            if match:
+                matched_text = match.group(0)
+                self.istring = self.istring[len(matched_text):]
+                return action((token_type, matched_text))
+
+        raise ScannerException(f"Unexpected char: {self.istring[0]}")
+
+
 
 if __name__ == "__main__":
 
