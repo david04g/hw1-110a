@@ -15,13 +15,27 @@ class ScannerException(Exception):
 class NGScanner:
     def __init__(self, tokens: List[Tuple[Token,str,Callable[[Lexeme],Lexeme]]]) -> None:
         self.tokens = tokens
+        self.actions = {tok.name: action for tok, _, action in self.tokens}
+        named_groups = [f"(?P<{tok.name}>{regex})" for tok, regex, _ in self.tokens]
+        self.master_pat = re.compile("|".join(named_groups))
 
     def input_string(self, input_string:str) -> None:
         self.istring = input_string
+        self.pos = 0
         
     def token(self) -> Optional[Lexeme]:
-        # Implement me!
-        pass
+        while self.pos < len(self.istring):
+            match = self.master_pat.match(self.istring, self.pos)
+            if not match:
+                raise ScannerException(f"Unexpected char: {self.istring[self.pos]}")
+            ttype = match.lastgroup
+            mtext = match.group(ttype)
+            self.pos = match.end()
+            if ttype == "IGNORE":
+                continue
+            lexeme = Lexeme(Token[ttype], mtext)
+            return self.actions[ttype](lexeme)
+        return None
 
 if __name__ == "__main__":
 
